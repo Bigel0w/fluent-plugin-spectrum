@@ -1,0 +1,8 @@
+<source>
+  type spectrum
+  tag alert.spectrum
+</source>
+
+<match alert.spectrum*>
+  type stdout
+</match>
