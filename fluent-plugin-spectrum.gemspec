@@ -4,11 +4,11 @@ $:.push File.expand_path("../lib", __FILE__)
 Gem::Specification.new do |gem|
   gem.name          = "fluent-plugin-spectrum"
   gem.version       = "0.0.1"
-  gem.date          = '2015-01-30'
+  gem.date          = '2015-02-24'
   gem.authors       = ["Alex Pena"]
   gem.email         = ["alex_pena@intuit.com"]
   gem.summary       = %q{Fluentd input plugin for Spectrum Alerts}
-  gem.description   = %q{FLuentd plugin for Spectrum Alerts... WIP}
+  gem.description   = %q{Fluentd plugin for Spectrum Alerts... WIP}
   gem.homepage      = 'https://github.com/Bigel0w/fluent-plugin-spectrum'
   gem.license       = 'MIT'
 
@@ -19,6 +19,7 @@ Gem::Specification.new do |gem|
 
   gem.add_development_dependency "rake", '~> 0.9', '>= 0.9.6'
 
-  gem.add_runtime_dependency "fluentd", '~> 0.10', '>= 0.10.51'
-  gem.add_runtime_dependency "snmp", '~> 1.1', '>= 1.1.1'
+  gem.add_runtime_dependency "fluentd", '~> 0.10', '>= 0.10.52'
+  gem.add_runtime_dependency "json", '~> 1.1', '>= 1.8.2'
+  gem.add_runtime_dependency "rest_client", '~> 1.1', '>= 1.8.3'
 end
