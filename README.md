@@ -21,8 +21,8 @@ Or install it yourself as:
 Add the following into your fluentd config.
 
     <source>
-      type spectrum        # required, chossing the input plugin.
-      endpoint http://cprdspectws004.corp.intuit.net   # required, Spectrum EndPoint
+      type spectrum        # required, choosing the input plugin.
+      endpoint hostname    # required, FQDN of Spectrum EndPoint
       username ws_user     # optional, interface to listen on, default 0 for all.
       password ws_password # optional, interface to listen on, default 0 for all.
       tag alert.spectrum   # optional, tag to assign to events, default is alert.spectrum 
