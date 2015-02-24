@@ -5,11 +5,13 @@ module Fluent
 
     # Define default configurations
     config_param :tag, :string, :default => "alert.spectrum"
-    config_param :endpoint, :string, :default => "http://cprdspectws004.corp.intuit.net"
+    config_param :endpoint, :string, :default => "http://cprdspectws004.corp.intuit.net" # Path /spectrum/restful/alarms
     config_param :interval, :integer, :default => '300'
-    config_param :spectrum_user, :string, :default => "username"
-    config_param :spectrum_pass, :string, :default => "password"
+    config_param :user, :string, :default => "username"
+    config_param :pass, :string, :default => "password"
     config_param :include_raw, :string, :default => "false"
+    # Add a fields all or list option
+    # error checking in every section
 
     # Initialize and bring in dependencies
     def initialize
@@ -21,35 +23,10 @@ module Fluent
     # Load internal and external configs
     def configure(conf)
       super
+      ### Add check for required fields. 
       @conf = conf
-    end # def configure
-
-    # Start Spectrum Poller
-    def start
-      super
-      @loop = Coolio::Loop.new
-      timer_trigger = TimerWatcher.new(@interval, true, &method(:input))
-      timer_trigger.attach(@loop)
-      @thread = Thread.new(&method(:run))
-      $log.info "starting spectrum poller, endpoint #{@endpoint} interval #{@interval}"
-    end # def start
-
-    # Stop Listener and cleanup any open connections.
-    def shutdown
-      super
-      @loop.stop
-      @thread.join
-    end
-
-    def run
-      @loop.run
-      $log.info "Running Spectrum Input"
-    end
-
-    def input
-      $log.info "Input loop polling Spectrum TimeStamp: #{Engine.now} Epoch: #{Engine.now.to_i}"
       # All attributes we will pull from Spectrum
-      spectrum_access_code={
+      @spectrum_access_code={
         "0x11f9c" => "ALARM_ID",
         "0x11f4e" => "CREATION_DATE",
         "0x11f56" => "SEVERITY",
@@ -93,14 +70,42 @@ module Fluent
         #{}"0x11f50" => "CAUSE_CODE",
         #{}"0x10009" => "SECURITY_STRING"
       }
-
+      # Create XML chunk for attributes we care about
       @attr_of_interest=""
-      spectrum_access_code.each do |key, array|
-        @attr_of_interest += " <rs:requested-attribute id=\"#{key}\"/>" 
+      @spectrum_access_code.each do |key, array|
+        @attr_of_interest += " <rs:requested-attribute id=\"#{key}\"/>"
       end
+      # Setup Rest Call to Spectrum EndPoint
+      @url = @endpoint.to_s + '/spectrum/restful/alarms'
+      def spectrumEnd
+        RestClient::Resource.new(@url,@user,@pass)
+      end
+    end # def configure
 
+    def start
+      super
+      @loop = Coolio::Loop.new
+      timer_trigger = TimerWatcher.new(@interval, true, &method(:input))
+      timer_trigger.attach(@loop)
+      @thread = Thread.new(&method(:run))
+      $log.info "starting spectrum poller, endpoint #{@endpoint} interval #{@interval}"
+    end # def start
+
+    def shutdown
+      super
+      @loop.stop
+      @thread.join
+    end
+
+    def run
+      @loop.run
+    end
+
+    def input
+      $log.info "Input loop polling Spectrum - Epoch: #{Engine.now.to_i}"
+      # Set current lookback time
       alertStartTime = Engine.now.to_i - @interval.to_i 
-  
+
       ## XML required for spectrum post
       @xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
       <rs:alarm-request throttlesize=\"10000\"
@@ -108,7 +113,7 @@ module Fluent
       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
       xsi:schemaLocation=\"http://www.ca.com/spectrum/restful/schema/request ../../../xsd/Request.xsd \">
       <rs:attribute-filter>
-        <search-criteria xmlns=\"http://www.ca.com/spectrum/restful/schema/filter\">   
+        <search-criteria xmlns=\"http://www.ca.com/spectrum/restful/schema/filter\">
         <filtered-models>
           <greater-than>
             <attribute id=\"0x11f4e\">
@@ -121,23 +126,24 @@ module Fluent
       #{@attr_of_interest}
       </rs:alarm-request>"
 
-      $url = @endpoint.to_s + '/spectrum/restful/alarms'
-      def spectrumEnd
-        RestClient::Resource.new($url,@spectrum_user,@spectrum_pass)
-      end
-
       def to_utf8(str)
         str = str.force_encoding('UTF-8')
         return str if str.valid_encoding?
         str.encode("UTF-8", 'binary', invalid: :replace, undef: :replace, replace: '')
-      end     
+      end
 
       responsePost=spectrumEnd.post @xml,:content_type => 'application/xml',:accept => 'application/json'
       body = JSON.parse(responsePost.body)
       body['ns1.alarm-response-list']['ns1.alarm-responses']['ns1.alarm'].each do |alarm|
         record_hash = Hash.new
+        record_hash['event_type'] = @tag.to_s
+        record_hash['intermediary_source'] = @endpoint.to_s  
         alarm['ns1.attribute'].each do |attribute|
-          record_hash[spectrum_access_code[attribute['@id'].to_s].to_s] = to_utf8(attribute['$'].to_s)
+          record_hash[@spectrum_access_code[attribute['@id'].to_s].to_s] = to_utf8(attribute['$'].to_s)
+        end
+        # include raw?
+        if @include_raw.to_s == "true"  
+          record_hash['raw'] = alarm  
         end
         Engine.emit(@tag, record_hash['CREATION_DATE'].to_i,record_hash)
       end
