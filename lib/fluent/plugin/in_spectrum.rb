@@ -96,6 +96,9 @@ module Fluent
 
     def run
       @loop.run
+    rescue
+        $log.error "Spectrum :: unexpected error", :error=>$!.to_s
+        $log.error_backtrace
     end # def run
 
     def input
@@ -151,6 +154,7 @@ module Fluent
           Engine.emit(@tag, record_hash['CREATION_DATE'].to_i,record_hash)
         end
       elsif body['ns1.alarm-response-list']['@total-alarms'].to_i == 1
+        begin
         $log.info "Spectrum :: returned #{body['ns1.alarm-response-list']['@total-alarms'].to_i} alarms"
         record_hash = Hash.new # temp hash to hold attributes of alarm
         record_hash['event_type'] = @tag.to_s
@@ -161,9 +165,12 @@ module Fluent
         end
         # include raw?
         if @include_raw.to_s == "true"  
-          record_hash['raw'] = alarm  
+          record_hash['raw'] = body['ns1.alarm-response-list']['ns1.alarm-responses']['ns1.alarm']  
         end
         Engine.emit(@tag, record_hash['CREATION_DATE'].to_i,record_hash)
+      end
+      else
+        $log.info "Spectrum :: returned #{body['ns1.alarm-response-list']['@total-alarms'].to_i} alarms"
       end  
     end
   end # class SpectrumInput
