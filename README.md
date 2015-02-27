@@ -20,19 +20,19 @@ Or install it yourself as:
 ## Usage
 Add the following into your fluentd config.
 
-<source>
- type spectrum # required, choosing the input plugin
- endpoint spectrumapi.corp.yourdomain.net # required, FQDN of spectrum endpoint
- user username # required, username for APIs
- pass password # required, password for APIs
- tag alert.spectrum # optional, tag to assign to events, default is alert.spectrum
- interval 60 # optional, interval in seconds for how often to poll, defaults to 300
- include_raw false # optional, include original object as key raw
-</source>
+	<source>
+	 type spectrum # required, choosing the input plugin
+	 endpoint spectrumapi.corp.yourdomain.net # required, FQDN of spectrum endpoint
+	 user username # required, username for APIs
+	 pass password # required, password for APIs
+	 tag alert.spectrum # optional, tag to assign to events, default is alert.spectrum
+	 interval 60 # optional, interval in seconds for how often to poll, defaults to 300
+	 include_raw false # optional, include original object as key raw
+	</source>
 
-<match alert.spectrum>
- type stdout
-</match>
+	<match alert.spectrum>
+	 type stdout
+	</match>
 
 Now startup fluentd
 
