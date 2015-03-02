@@ -38,12 +38,13 @@ Now startup fluentd
 
     $ sudo fluentd -c fluent.conf &
 
-Send a test 
-    TBD
+Send a test
+
+	TBD: Still need to create an example
 
 ## To Do
-Add retry login. On timeout/failure retry, how often, increasing delay? (how would that affect polling time, possible duplicates?)
-All flag to allow specifying spectrum attributes to get or get _ALL_
-Add flag to allow start date/time if users want to backfill data from a specific date. then start loop. 
-Add flag to disable loop, if users only wanted to backfill from datetime to now or specific end time. 
-change loop to allow multiple runs to stack on eachother to avoid missing data?
+* Add retry login. On timeout/failure retry, how often, increasing delay? (how would that affect polling time, possible duplicates?)
+* All flag to allow specifying spectrum attributes to get or get _ALL_
+* Add flag to allow start date/time if users want to backfill data from a specific date. then start loop. 
+* Add flag to disable loop, if users only wanted to backfill from datetime to now or specific end time. 
+* Change loop to allow multiple runs to stack on eachother to avoid missing data?
