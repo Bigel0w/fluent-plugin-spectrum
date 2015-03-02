@@ -3,7 +3,7 @@ $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |gem|
   gem.name          = "fluent-plugin-spectrum"
-  gem.version       = "0.0.1"
+  gem.version       = "0.0.2"
   gem.date          = '2015-02-24'
   gem.authors       = ["Alex Pena"]
   gem.email         = ["alex_pena@intuit.com"]

@@ -2,9 +2,19 @@ module Fluent
 # TODO:
 # Add a fields all or list option
 # error checking in every section  
+    # class for handling interval in loop
+  class TimerWatcher < Coolio::TimerWatcher
+    def initialize(interval, repeat, &callback)
+      @callback = callback
+      super(interval, repeat)
+    end # def initialize
+    def on_timer
+      @callback.call
+    end # def on_timer
+  end
+
   class SpectrumInput < Input
     Fluent::Plugin.register_input('spectrum', self)
-
     config_param :tag, :string, :default => "alert.spectrum"
     config_param :endpoint, :string, :default => "pleasechangeme.com" #fqdn of endpoint
     config_param :interval, :integer, :default => '300' #Default 5 minutes
@@ -12,6 +22,19 @@ module Fluent
     config_param :pass, :string, :default => "password"
     config_param :include_raw, :string, :default => "false" #Include original object as raw
     config_param :attributes, :string, :default => "ALL" # fields to include, ALL for... well, ALL.
+
+    # function to UTF8 encode
+    def to_utf8(str)
+      str = str.force_encoding('UTF-8')
+      return str if str.valid_encoding?
+      str.encode("UTF-8", 'binary', invalid: :replace, undef: :replace, replace: '')
+    end
+
+    def parseAttributes(alarmAttribute)
+      key = @spectrum_access_code[alarmAttribute['@id'].to_s].to_s
+      value = ((to_utf8(alarmAttribute['$'].to_s)).strip).gsub(/\r?\n/, " ")
+      return key,value
+    end
 
     def initialize
       require 'rest_client'
@@ -92,6 +115,9 @@ module Fluent
       super
       @loop.stop
       @thread.join
+    rescue
+      $log.error "Spectrum :: unexpected error", :error=>$!.to_s
+      $log.error_backtrace
     end # def shutdown
 
     def run
@@ -103,16 +129,9 @@ module Fluent
 
     def input
       alertStartTime = Engine.now.to_i - @interval.to_i 
-      $log.info "Spectrum :: Polling for alerts for time period: #{alertStartTime.to_i} - #{Engine.now.to_i}"
+      $log.info "Spectrum :: Polling alerts for time period: #{alertStartTime.to_i} - #{Engine.now.to_i}"
 
-      # function to UTF8 encode
-      def to_utf8(str)
-        str = str.force_encoding('UTF-8')
-        return str if str.valid_encoding?
-        str.encode("UTF-8", 'binary', invalid: :replace, undef: :replace, replace: '')
-      end
-
-      # XML for spectrum post
+      # Format XML for spectrum post
       @xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
       <rs:alarm-request throttlesize=\"10000\"
       xmlns:rs=\"http://www.ca.com/spectrum/restful/schema/request\"
@@ -135,55 +154,57 @@ module Fluent
       # Post to Spectrum and parse results  
       responsePost=spectrumEnd.post @xml,:content_type => 'application/xml',:accept => 'application/json'
       body = JSON.parse(responsePost.body)
-      # Only continue if we have alarms in results
+
+      # Processing for multiple alerts returned
       if body['ns1.alarm-response-list']['@total-alarms'].to_i > 1
-        $log.info "Spectrum :: returned #{body['ns1.alarm-response-list']['@total-alarms'].to_i} alarms"
-        # iterate through alarms in results
+        $log.info "Spectrum :: returned #{body['ns1.alarm-response-list']['@total-alarms'].to_i} alarms for period #{alertStartTime.to_i} - #{Engine.now.to_i}"
+        # iterate through each alarm
         body['ns1.alarm-response-list']['ns1.alarm-responses']['ns1.alarm'].each do |alarm|
+          # Create initial structure
           record_hash = Hash.new # temp hash to hold attributes of alarm
+          raw_array = Array.new # temp hash to hold attributes of alarm for raw
           record_hash['event_type'] = @tag.to_s
           record_hash['intermediary_source'] = @endpoint.to_s
-          # iterate though alarm attributes and add to temp hash  
+          # iterate though alarm attributes
           alarm['ns1.attribute'].each do |attribute|
-            record_hash[@spectrum_access_code[attribute['@id'].to_s].to_s] = to_utf8(attribute['$'].to_s)
+            key,value = parseAttributes(attribute)
+            record_hash[key] = value
+            if @include_raw.to_s == "true"
+              raw_array << { "#{key}" => "#{value}" }
+            end
           end
-          # include raw?
+          # append raw object
           if @include_raw.to_s == "true"  
-            record_hash['raw'] = alarm  
+            record_hash[:raw] = raw_array
           end
           Engine.emit(@tag, record_hash['CREATION_DATE'].to_i,record_hash)
         end
+      # Processing for single alarm returned  
       elsif body['ns1.alarm-response-list']['@total-alarms'].to_i == 1
-        begin
-        $log.info "Spectrum :: returned #{body['ns1.alarm-response-list']['@total-alarms'].to_i} alarms"
+        $log.info "Spectrum :: returned #{body['ns1.alarm-response-list']['@total-alarms'].to_i} alarms for period #{alertStartTime.to_i} - #{Engine.now.to_i}"
+        # Create initial structure
         record_hash = Hash.new # temp hash to hold attributes of alarm
+        raw_array = Array.new # temp hash to hold attributes of alarm for raw
         record_hash['event_type'] = @tag.to_s
         record_hash['intermediary_source'] = @endpoint.to_s
         # iterate though alarm attributes and add to temp hash  
         body['ns1.alarm-response-list']['ns1.alarm-responses']['ns1.alarm']['ns1.attribute'].each do |attribute|
-          record_hash[@spectrum_access_code[attribute['@id'].to_s].to_s] = to_utf8(attribute['$'].to_s)
+          key,value = parseAttributes(attribute)
+          record_hash[key] = value
+          if @include_raw.to_s == "true"
+            raw_array << { "#{key}" => "#{value}" }
+          end
         end
-        # include raw?
+        # append raw object
         if @include_raw.to_s == "true"  
-          record_hash['raw'] = body['ns1.alarm-response-list']['ns1.alarm-responses']['ns1.alarm']  
+          record_hash[:raw] = raw_array
         end
         Engine.emit(@tag, record_hash['CREATION_DATE'].to_i,record_hash)
-      end
+      # No alarms returned
       else
-        $log.info "Spectrum :: returned #{body['ns1.alarm-response-list']['@total-alarms'].to_i} alarms"
-      end  
-    end
+        $log.info "Spectrum :: returned #{body['ns1.alarm-response-list']['@total-alarms'].to_i} alarms for period #{alertStartTime.to_i} - #{Engine.now.to_i}"
+      end    
+    
+    end # def input
   end # class SpectrumInput
-
-  # class for handling interval in loop
-  class TimerWatcher < Coolio::TimerWatcher
-    def initialize(interval, repeat, &callback)
-      @callback = callback
-      super(interval, repeat)
-    end # def initialize
-    def on_timer
-      @callback.call
-    end # def on_timer
-  end
-
 end # module Fluent

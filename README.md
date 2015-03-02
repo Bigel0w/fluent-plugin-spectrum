@@ -42,4 +42,8 @@ Send a test
     TBD
 
 ## To Do
-Things left to do, not in any particular order.
+Add retry login. On timeout/failure retry, how often, increasing delay? (how would that affect polling time, possible duplicates?)
+All flag to allow specifying spectrum attributes to get or get _ALL_
+Add flag to allow start date/time if users want to backfill data from a specific date. then start loop. 
+Add flag to disable loop, if users only wanted to backfill from datetime to now or specific end time. 
+change loop to allow multiple runs to stack on eachother to avoid missing data?
