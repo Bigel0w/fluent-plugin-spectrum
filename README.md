@@ -22,7 +22,6 @@ Add the following into your fluentd config.
 
 Simple:
 
-	```
 	<source>
 		type spectrum 						# required, choosing the input plugin
     	endpoint spectrum.yourdomain.com 	# required, FQDN of spectrum endpoint
@@ -36,11 +35,9 @@ Simple:
 	<match alert.spectrum>
   		type stdout
 	</match>
-	```
 
 Advanced:
 
-	```
 	<source>
 		type spectrum 						# required, choosing the input plugin
     	endpoint spectrum.yourdomain.com 	# required, FQDN of spectrum endpoint
@@ -75,7 +72,6 @@ Advanced:
 	<match processed.alert>
   		type stdout
 	</match>
-	```
 
 Now startup fluentd
 
