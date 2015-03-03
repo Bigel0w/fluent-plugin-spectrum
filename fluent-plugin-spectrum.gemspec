@@ -6,7 +6,7 @@ Gem::Specification.new do |gem|
   gem.version       = "0.0.3"
   gem.date          = '2015-02-24'
   gem.authors       = ["Alex Pena"]
-  gem.email         = ["alex_pena@intuit.com"]
+  gem.email         = ["pena.alex@gmail.com"]
   gem.summary       = %q{Fluentd input plugin for Spectrum Alerts}
   gem.description   = %q{Fluentd plugin for Spectrum Alerts... WIP}
   gem.homepage      = 'https://github.com/Bigel0w/fluent-plugin-spectrum'
