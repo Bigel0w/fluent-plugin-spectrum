@@ -37,7 +37,7 @@ module Fluent
     end
 
     def initialize
-      require 'rest_client'
+      require 'rest-client'
       require 'json'
       super
     end # def initialize
