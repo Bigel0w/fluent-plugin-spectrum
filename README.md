@@ -2,6 +2,11 @@
 
 fluent-plugin-spectrum is an input plug-in for [Fluentd](http://fluentd.org)
 
+## Status
+[![Gem Version](https://badge.fury.io/rb/fluent-plugin-spectrum.png)](http://badge.fury.io/rb/fluent-plugin-spectrum)
+[![Build Status](https://travis-ci.org/Bigel0w/fluent-plugin-spectrum.png?branch=master)](https://travis-ci.org/Bigel0w/fluent-plugin-spectrum)
+[![Coverage Status](https://coveralls.io/repos/Bigel0w/fluent-plugin-spectrum/badge.png?branch=master)](https://coveralls.io/r/Bigel0w/fluent-plugin-spectrum?branch=master)
+
 ## Installation
 
 These instructions assume you already have fluentd installed. 
