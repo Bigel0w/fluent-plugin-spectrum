@@ -6,9 +6,6 @@ class SpectrumInputTest < Test::Unit::TestCase
   end
 
   CONFIG = %[
-    user username
-    pass password
-    tag alert.spectrum
   ]
 
   def create_driver(conf=CONFIG)
