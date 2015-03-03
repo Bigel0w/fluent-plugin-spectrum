@@ -16,12 +16,12 @@ module Fluent
   class SpectrumInput < Input
     Fluent::Plugin.register_input('spectrum', self)
     config_param :tag, :string, :default => "alert.spectrum"
-    config_param :endpoint, :string, :default => "pleasechangeme.com" #fqdn of endpoint
-    config_param :interval, :integer, :default => '300' #Default 5 minutes
+    config_param :endpoint, :string, :default => "pleasechangeme.com"
+    config_param :interval, :integer, :default => 300
     config_param :user, :string, :default => "username"
     config_param :pass, :string, :default => "password"
-    config_param :include_raw, :string, :default => "false" #Include original object as raw
-    config_param :attributes, :string, :default => "ALL" # fields to include, ALL for... well, ALL.
+    config_param :include_raw, :string, :default => "false"
+    config_param :attributes, :string, :default => "ALL"
 
     # function to UTF8 encode
     def to_utf8(str)
