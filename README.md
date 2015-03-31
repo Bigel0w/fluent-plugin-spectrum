@@ -82,16 +82,16 @@ Now startup fluentd
 
     $ sudo fluentd -c fluent.conf &
 
-Verify
+Verify:
 
-  You should see output like the following if you have events in spectrum and connectivity works.
+		You should see output like the following if you have events in spectrum and connectivity works.
 
-  FluentD Log Lines:
-  2015-03-05 15:04:02 -0800 [info]: Spectrum :: Polling alerts for time period: 1425596639 - 1425596642
-  2015-03-05 15:04:07 -0800 [info]: Spectrum :: returned 1 alarms for period 1425596639 - 1425596647
+		FluentD Log Lines:
+		2015-03-05 15:04:02 -0800 [info]: Spectrum :: Polling alerts for time period: 1425596639 - 1425596642
+		2015-03-05 15:04:07 -0800 [info]: Spectrum :: returned 1 alarms for period 1425596639 - 1425596647
 
-  Output:
-  2015-03-05 15:04:00 -0800 alert.spectrum: {"event_type":"alert.spectrum","intermediary_source":"spectrumapi001.corp.yourdomain.net","ALARM_ID":"54f8e0e0-e706-12c2-0165-005056a07ac5","CREATION_DATE":"1425596640","SEVERITY":"3","ALARM_TITLE":"LOGMATCH TRAPSEND CRIT","HOSTNAME":"yourhost001.corp.yourdomain.net","IP_ADDRESS":"10.10.0.14","ORIGINATING_EVENT_ATTR":"A SEC logmatch trapsend CRIT Your Alert Message here","MODEL_STRING":"Host_Device","ACKNOWLEDGED":"false","ALARM_STATUS":"","OCCURRENCES":"1","TROUBLE_SHOOTER":"","USER_CLEARABLE":"true","TROUBLE_TICKET_ID":"","PERSISTENT":"true","GC_NAME":"Your_Global_Collection"}
+		Output:
+		2015-03-05 15:04:00 -0800 alert.spectrum: {"event_type":"alert.spectrum","intermediary_source":"spectrumapi001.corp.yourdomain.net","ALARM_ID":"54f8e0e0-e706-12c2-0165-005056a07ac5","CREATION_DATE":"1425596640","SEVERITY":"3","ALARM_TITLE":"LOGMATCH TRAPSEND CRIT","HOSTNAME":"yourhost001.corp.yourdomain.net","IP_ADDRESS":"10.10.0.14","ORIGINATING_EVENT_ATTR":"A SEC logmatch trapsend CRIT Your Alert Message here","MODEL_STRING":"Host_Device","ACKNOWLEDGED":"false","ALARM_STATUS":"","OCCURRENCES":"1","TROUBLE_SHOOTER":"","USER_CLEARABLE":"true","TROUBLE_TICKET_ID":"","PERSISTENT":"true","GC_NAME":"Your_Global_Collection"}
 
 ## To Do
 * Add retry login. On timeout/failure retry, how often, increasing delay? (how would that affect polling time, possible duplicates?)
