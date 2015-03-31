@@ -1,8 +1,13 @@
 <source>
-  type spectrum
-  tag alert.spectrum
+	type spectrum
+	endpoint spectrum.changeme.com
+	user changeme
+    pass changeme
+    tag alert.spectrum
+    interval 60
+    include_raw false
 </source>
 
-<match alert.spectrum*>
-  type stdout
+<match alert.spectrum>
+    type stdout
 </match>
