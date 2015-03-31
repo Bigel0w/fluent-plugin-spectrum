@@ -236,7 +236,7 @@ module Fluent
             raw_array = Array.new # temp hash to hold attributes of alarm for raw
             record_hash['event_type'] = @tag.to_s
             record_hash['intermediary_source'] = @endpoint.to_s
-            record_hash['recieved_time_fluentd'] = pollingEnd.to_s
+            record_hash['recieved_time_input'] = pollingEnd.to_s
             # iterate though alarm attributes
             alarm['ns1.attribute'].each do |attribute|
               key,value = parseAttributes(attribute)
@@ -259,7 +259,7 @@ module Fluent
           raw_array = Array.new # temp hash to hold attributes of alarm for raw
           record_hash['event_type'] = @tag.to_s
           record_hash['intermediary_source'] = @endpoint.to_s
-          record_hash['recieved_time_fluentd'] = pollingEnd.to_s
+          record_hash['recieved_time_input'] = pollingEnd.to_s
           # iterate though alarm attributes and add to temp hash  
           body['ns1.alarm-response-list']['ns1.alarm-responses']['ns1.alarm']['ns1.attribute'].each do |attribute|
             key,value = parseAttributes(attribute)
