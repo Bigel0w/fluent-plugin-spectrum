@@ -1,16 +1,19 @@
 module Fluent
   class SpectrumInput < Input
     Fluent::Plugin.register_input('spectrum', self)
-    config_param :tag, :string, :default => "alert.spectrum"
-    config_param :endpoint, :string, :default => nil
-    config_param :username, :string, :default => nil
-    config_param :password, :string, :default => nil
-    config_param :interval, :integer, :default => 300 # shoud stay above 10, avg response is 5-7 seconds
+    
+    # Configurations
+    INTERVAL_MIN = 10 # shoud stay above 10, avg response is 5-7 seconds
+    config_param :tag,          :string,  :default => "alert.spectrum"
+    config_param :endpoint,     :string,  :default => nil
+    config_param :username,     :string,  :default => nil
+    config_param :password,     :string,  :default => nil
+    config_param :interval,     :integer, :default => INTERVAL_MIN
 
-    config_param :state_file, :string, :default => nil
-    config_param :include_raw, :string, :default => "false"
-    config_param :attributes, :string, :default => "ALL"
-    config_param :select_limit, :time, :default => 10000
+    config_param  :state_file,    :string, :default => nil
+    config_param  :include_raw,   :string, :default => "false"
+    config_param  :attributes,    :string, :default => "ALL"
+    config_param  :select_limit,  :time, :default => 10000
 
     # Classes
     class TimerWatcher < Coolio::TimerWatcher
@@ -236,7 +239,7 @@ module Fluent
             raw_array = Array.new # temp hash to hold attributes of alarm for raw
             record_hash['event_type'] = @tag.to_s
             record_hash['intermediary_source'] = @endpoint.to_s
-            record_hash['received_time_input'] = pollingEnd.to_s
+            record_hash['receive_time_input'] = pollingEnd.to_s
             # iterate though alarm attributes
             alarm['ns1.attribute'].each do |attribute|
               key,value = parseAttributes(attribute)
@@ -259,7 +262,7 @@ module Fluent
           raw_array = Array.new # temp hash to hold attributes of alarm for raw
           record_hash['event_type'] = @tag.to_s
           record_hash['intermediary_source'] = @endpoint.to_s
-          record_hash['received_time_input'] = pollingEnd.to_s
+          record_hash['receive_time_input'] = pollingEnd.to_s
           # iterate though alarm attributes and add to temp hash  
           body['ns1.alarm-response-list']['ns1.alarm-responses']['ns1.alarm']['ns1.attribute'].each do |attribute|
             key,value = parseAttributes(attribute)
