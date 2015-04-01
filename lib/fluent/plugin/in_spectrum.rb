@@ -148,7 +148,7 @@ module Fluent
       # Setup URL Resource
       def resource
         @url = 'http://' + @endpoint.to_s + '/spectrum/restful/alarms'
-        RestClient::Resource.new(@url, :user => @username, :password => @password, :open_timeout => 3, :timeout => (@interval * 2))
+        RestClient::Resource.new(@url, :user => @username, :password => @password, :open_timeout => 5, :timeout => (@interval * 3))
       end
 
       ### need to add this but first figure out how to pass a one time override for timeout since get takes a longtime to return
@@ -236,7 +236,7 @@ module Fluent
             raw_array = Array.new # temp hash to hold attributes of alarm for raw
             record_hash['event_type'] = @tag.to_s
             record_hash['intermediary_source'] = @endpoint.to_s
-            record_hash['recieved_time_input'] = pollingEnd.to_s
+            record_hash['received_time_input'] = pollingEnd.to_s
             # iterate though alarm attributes
             alarm['ns1.attribute'].each do |attribute|
               key,value = parseAttributes(attribute)
@@ -259,7 +259,7 @@ module Fluent
           raw_array = Array.new # temp hash to hold attributes of alarm for raw
           record_hash['event_type'] = @tag.to_s
           record_hash['intermediary_source'] = @endpoint.to_s
-          record_hash['recieved_time_input'] = pollingEnd.to_s
+          record_hash['received_time_input'] = pollingEnd.to_s
           # iterate though alarm attributes and add to temp hash  
           body['ns1.alarm-response-list']['ns1.alarm-responses']['ns1.alarm']['ns1.attribute'].each do |attribute|
             key,value = parseAttributes(attribute)
