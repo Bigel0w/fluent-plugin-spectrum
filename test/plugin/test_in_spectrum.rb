@@ -21,7 +21,7 @@ class SpectrumInputTest < Test::Unit::TestCase
   end
 
   def test_params
-    d = create_driver.instance
+    d = create_driver
     assert_equal "test.endpoint.com", d.instance.endpoint
     assert_equal "test_username", d.instance.username
     assert_equal "test_password", d.instance.password
