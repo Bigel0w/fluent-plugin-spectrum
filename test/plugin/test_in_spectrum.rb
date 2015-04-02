@@ -12,12 +12,16 @@ class SpectrumInputTest < Test::Unit::TestCase
     endpoint test.endpoint.com
   ]
 
-  def create_driver(conf=CONFIG)
+  def create_driver(conf = CONFIG)
     Fluent::Test::InputTestDriver.new(Fluent::SpectrumInput).configure(conf)
   end
 
   def test_configure
-    d = create_driver('')
+    assert_nothing_raised { create_driver }
+  end
+
+  def test_params
+    d = create_driver.instance
     assert_equal "test.endpoint.com", d.instance.endpoint
     assert_equal "test_username", d.instance.username
     assert_equal "test_password", d.instance.password
