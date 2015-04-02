@@ -1,14 +1,15 @@
 require 'helper'
 
 class SpectrumInputTest < Test::Unit::TestCase
+
   def setup
     Fluent::Test.setup
   end
 
   CONFIG = %[
-    username  test_username
-    password  test_password
-    endpoint  test.endpoint.com
+    username test_username
+    password test_password
+    endpoint test.endpoint.com
   ]
 
   def create_driver(conf=CONFIG)
@@ -24,4 +25,5 @@ class SpectrumInputTest < Test::Unit::TestCase
     assert_equal "false", d.instance.include_raw
     assert_equal 'alert.spectrum', d.instance.tag
   end
+
 end
