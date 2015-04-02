@@ -4,16 +4,16 @@ module Fluent
     
     # Configurations
     INTERVAL_MIN = 10 # shoud stay above 10, avg response is 5-7 seconds
-    config_param :tag,          :string,  :default => "alert.spectrum"
-    config_param :endpoint,     :string,  :default => nil
-    config_param :username,     :string,  :default => nil
-    config_param :password,     :string,  :default => nil
-    config_param :interval,     :integer, :default => INTERVAL_MIN
+    config_param  :tag,           :string,  :default => "alert.spectrum"
+    config_param  :endpoint,      :string,  :default => nil
+    config_param  :username,      :string,  :default => nil
+    config_param  :password,      :string,  :default => nil
     config_param  :state_file,    :string,  :default => nil
-    config_param  :include_raw,   :string,  :default => "false"
     config_param  :attributes,    :string,  :default => "ALL"
-    config_param  :select_limit,  :time,    :default => 10000
-    config_param  :debug_mode,    :default => false
+    config_param  :interval,      :integer, :default => INTERVAL_MIN
+    config_param  :select_limit,  :integer, :default => 10000
+    config_param  :include_raw,   :bool,    :default => "false"
+    config_param  :debug_mode,    :bool,    :default => false
 
     # Classes
     class TimerWatcher < Coolio::TimerWatcher
