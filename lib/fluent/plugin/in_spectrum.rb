@@ -9,11 +9,11 @@ module Fluent
     config_param :username,     :string,  :default => nil
     config_param :password,     :string,  :default => nil
     config_param :interval,     :integer, :default => INTERVAL_MIN
-
-    config_param  :state_file,    :string, :default => nil
-    config_param  :include_raw,   :string, :default => "false"
-    config_param  :attributes,    :string, :default => "ALL"
-    config_param  :select_limit,  :time, :default => 10000
+    config_param  :state_file,    :string,  :default => nil
+    config_param  :include_raw,   :string,  :default => "false"
+    config_param  :attributes,    :string,  :default => "ALL"
+    config_param  :select_limit,  :time,    :default => 10000
+    config_param  :debug_mode,    :default => false
 
     # Classes
     class TimerWatcher < Coolio::TimerWatcher
@@ -93,10 +93,22 @@ module Fluent
     def configure(conf)
       super 
       @conf = conf
-
+      # Only check configs if debug is off
+      unless @debug_mode
+        # Verify configs
+        # Stop if required fields are not set
+        unless @endpoint && @username && @password
+          raise ConfigError, "Spectrum :: ConfigError 'endpoint' and 'username' and 'password' must be all specified."
+        end
+        # Enforce min interval
+        if @interval.to_i < INTERVAL_MIN
+          raise ConfigError, "Spectrum :: ConfigError 'interval' must be #{INTERVAL_MIN} or over."
+        end
+      end
+      # Warn about optional state file
       unless @state_file
-        $log.warn "'state_file PATH' parameter is not set to a valid source."
-        $log.warn "this parameter is highly recommended to save the last known good timestamp to resume event consuming"
+        $log.warn "Spectrum :: 'state_file PATH' parameter is not set to a valid source."
+        $log.warn "Spectrum :: this parameter is highly recommended to save the last known good timestamp to resume event consuming"
       end
       # map of Spectrum attribute codes to names
       @spectrum_access_code={
@@ -147,13 +159,11 @@ module Fluent
       @spectrum_access_code.each do |key, array|
         @attr_of_interest += " <rs:requested-attribute id=\"#{key}\"/>"
       end
-      
-      # Setup URL Resource
+      # URL Resource
       def resource
         @url = 'http://' + @endpoint.to_s + '/spectrum/restful/alarms'
         RestClient::Resource.new(@url, :user => @username, :password => @password, :open_timeout => 5, :timeout => (@interval * 3))
       end
-
       ### need to add this but first figure out how to pass a one time override for timeout since get takes a longtime to return
       #test = resource.get
       #if test.code.to_s == 200
@@ -190,15 +200,20 @@ module Fluent
         pollingStart = Engine.now.to_i
         if @state_store.last_records.has_key?("spectrum") 
           alertStartTime = @state_store.last_records['spectrum']
-          #$log.info "Spectrum :: Got time record from state_store - #{alertStartTime}" 
+          if @debug_mode
+            $log.info "Spectrum :: Got time record from state_store - #{alertStartTime}"
+          end 
         else
           alertStartTime = (pollingStart.to_i - @interval.to_i)
-          #$log.info "Spectrum :: Got time record from initial config - #{alertStartTime}"
+          if @debug_mode
+            $log.info "Spectrum :: Got time record from initial config - #{alertStartTime}"
+          end
         end
         pollingEnd = ''
         pollingDuration = ''
-        #$log.info "Spectrum :: Polling alerts for time period < #{alertStartTime.to_i}"
-
+        if @debug_mode
+          $log.info "Spectrum :: Polling alerts for time period < #{alertStartTime.to_i}"
+        end
         # Format XML for spectrum post
         @xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
         <rs:alarm-request throttlesize=\"#{select_limit}\"
@@ -222,7 +237,9 @@ module Fluent
         # Post to Spectrum and parse results
         begin
           res=resource.post @xml,:content_type => 'application/xml',:accept => 'application/json'
-          #$log.info "Response code #{res.code.to_s}"
+          if @debug_mode
+            $log.info "Spectrum :: Response code #{res.code.to_s}"
+          end
           body = JSON.parse(res.body)
           pollingEnd = Engine.now.to_i
           @state_store.last_records['spectrum'] = pollingEnd
