@@ -13,3 +13,7 @@ branches:
     - master
 
 script: bundle exec rake test
+
+addons:
+  code_climate:
+    repo_token: c13cd5d4ecf62009fa2ad6afca2d11098375c731929a774231dcda32eb1cf63c
