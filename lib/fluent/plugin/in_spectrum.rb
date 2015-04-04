@@ -13,7 +13,6 @@ module Fluent
     config_param  :interval,      :integer, :default => INTERVAL_MIN
     config_param  :select_limit,  :integer, :default => 10000
     config_param  :include_raw,   :bool,    :default => "false"
-    config_param  :debug_mode,    :bool,    :default => false
 
     # Classes
     class TimerWatcher < Coolio::TimerWatcher
@@ -37,10 +36,9 @@ module Fluent
         if File.exists?(@path)
           @data = YAML.load_file(@path)
           if @data == false || @data == []
-            # this happens if an users created an empty file accidentally
             @data = {}
           elsif !@data.is_a?(Hash)
-            raise "state_file on #{@path.inspect} is invalid"
+            raise "Spectrum :: ConfigError state_file on #{@path.inspect} is invalid"
           end
         else
           @data = {}
@@ -93,17 +91,14 @@ module Fluent
     def configure(conf)
       super 
       @conf = conf
-      # Only check configs if debug is off
-      unless @debug_mode
-        # Verify configs
-        # Stop if required fields are not set
-        unless @endpoint && @username && @password
-          raise ConfigError, "Spectrum :: ConfigError 'endpoint' and 'username' and 'password' must be all specified."
-        end
-        # Enforce min interval
-        if @interval.to_i < INTERVAL_MIN
-          raise ConfigError, "Spectrum :: ConfigError 'interval' must be #{INTERVAL_MIN} or over."
-        end
+      # Verify configs
+      # Stop if required fields are not set
+      unless @endpoint && @username && @password
+        raise ConfigError, "Spectrum :: ConfigError 'endpoint' and 'username' and 'password' must be all specified."
+      end
+      # Enforce min interval
+      if @interval.to_i < INTERVAL_MIN
+        raise ConfigError, "Spectrum :: ConfigError 'interval' must be #{INTERVAL_MIN} or over."
       end
       # Warn about optional state file
       unless @state_file
@@ -164,13 +159,6 @@ module Fluent
         @url = 'http://' + @endpoint.to_s + '/spectrum/restful/alarms'
         RestClient::Resource.new(@url, :user => @username, :password => @password, :open_timeout => 5, :timeout => (@interval * 3))
       end
-      ### need to add this but first figure out how to pass a one time override for timeout since get takes a longtime to return
-      #test = resource.get
-      #if test.code.to_s == 200
-      #  $log.info "Spectrum :: Config testing #{@endpoint} succeeded with #{test.code.to_s} response code"
-      #else
-      #  raise Fluent::ConfigError, "http test failed"
-      #end
     end # def configure
 
     def start
@@ -200,20 +188,11 @@ module Fluent
         pollingStart = Engine.now.to_i
         if @state_store.last_records.has_key?("spectrum") 
           alertStartTime = @state_store.last_records['spectrum']
-          if @debug_mode
-            $log.info "Spectrum :: Got time record from state_store - #{alertStartTime}"
-          end 
         else
           alertStartTime = (pollingStart.to_i - @interval.to_i)
-          if @debug_mode
-            $log.info "Spectrum :: Got time record from initial config - #{alertStartTime}"
-          end
         end
         pollingEnd = ''
         pollingDuration = ''
-        if @debug_mode
-          $log.info "Spectrum :: Polling alerts for time period < #{alertStartTime.to_i}"
-        end
         # Format XML for spectrum post
         @xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
         <rs:alarm-request throttlesize=\"#{select_limit}\"
@@ -237,9 +216,6 @@ module Fluent
         # Post to Spectrum and parse results
         begin
           res=resource.post @xml,:content_type => 'application/xml',:accept => 'application/json'
-          if @debug_mode
-            $log.info "Spectrum :: Response code #{res.code.to_s}"
-          end
           body = JSON.parse(res.body)
           pollingEnd = Engine.now.to_i
           @state_store.last_records['spectrum'] = pollingEnd
@@ -297,9 +273,7 @@ module Fluent
         else
           $log.info "Spectrum :: returned #{body['ns1.alarm-response-list']['@total-alarms'].to_i} alarms for period < #{alertStartTime.to_i} took #{pollingDuration.to_i} seconds, ended at #{pollingEnd}"
         end
-        @state_store.update!
-        #return 
-        #exit   
+        @state_store.update!  
       end
     end # def input
   end # class SpectrumInput
