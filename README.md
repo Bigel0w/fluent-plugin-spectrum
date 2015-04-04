@@ -3,11 +3,11 @@
 fluent-plugin-spectrum is an input plug-in for [Fluentd](http://fluentd.org)
 
 ## Status
-[![Gem Version](https://badge.fury.io/rb/fluent-plugin-spectrum.png)](http://badge.fury.io/rb/fluent-plugin-spectrum)
 [![Build Status](https://travis-ci.org/Bigel0w/fluent-plugin-spectrum.png?branch=master)](https://travis-ci.org/Bigel0w/fluent-plugin-spectrum)
+[![Coverage Status](https://coveralls.io/repos/Bigel0w/fluent-plugin-spectrum/badge.png?branch=master)](https://coveralls.io/r/Bigel0w/fluent-plugin-spectrum?branch=master)
 [![Dependency Status](https://gemnasium.com/Bigel0w/fluent-plugin-spectrum.svg)](https://gemnasium.com/Bigel0w/fluent-plugin-spectrum)
 [![Code Climate](https://codeclimate.com/github/Bigel0w/fluent-plugin-spectrum/badges/gpa.svg)](https://codeclimate.com/github/Bigel0w/fluent-plugin-spectrum)
-[![Coverage Status](https://coveralls.io/repos/Bigel0w/fluent-plugin-spectrum/badge.png?branch=master)](https://coveralls.io/r/Bigel0w/fluent-plugin-spectrum?branch=master)
+[![Gem Version](https://badge.fury.io/rb/fluent-plugin-spectrum.png)](http://badge.fury.io/rb/fluent-plugin-spectrum)
 
 ## Installation
 
@@ -96,8 +96,6 @@ Verify:
 		2015-03-05 15:04:00 -0800 alert.spectrum: {"event_type":"alert.spectrum","intermediary_source":"spectrumapi001.corp.yourdomain.net","ALARM_ID":"54f8e0e0-e706-12c2-0165-005056a07ac5","CREATION_DATE":"1425596640","SEVERITY":"3","ALARM_TITLE":"LOGMATCH TRAPSEND CRIT","HOSTNAME":"yourhost001.corp.yourdomain.net","IP_ADDRESS":"10.10.0.14","ORIGINATING_EVENT_ATTR":"A SEC logmatch trapsend CRIT Your Alert Message here","MODEL_STRING":"Host_Device","ACKNOWLEDGED":"false","ALARM_STATUS":"","OCCURRENCES":"1","TROUBLE_SHOOTER":"","USER_CLEARABLE":"true","TROUBLE_TICKET_ID":"","PERSISTENT":"true","GC_NAME":"Your_Global_Collection"}
 
 ## To Do
-* Add retry login. On timeout/failure retry, how often, increasing delay? (how would that affect polling time, possible duplicates?)
 * All flag to allow specifying spectrum attributes to get or get _ALL_
 * Add flag to allow start date/time if users want to backfill data from a specific date. then start loop. 
 * Add flag to disable loop, if users only wanted to backfill from datetime to now or specific end time. 
-* Change loop to allow multiple runs to stack on eachother to avoid missing data?
