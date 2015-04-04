@@ -19,6 +19,7 @@ Gem::Specification.new do |gem|
   # dev deps
   gem.add_development_dependency "rake", '~> 10.0'
   gem.add_development_dependency "bundler", '~> 1.6'
+  gem.add_development_dependency "test-unit", '~> 3.0'
   # runtime deps
   gem.add_runtime_dependency "fluentd", '~> 0.12'
   gem.add_runtime_dependency "json", '~> 1.8'
