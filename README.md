@@ -29,56 +29,52 @@ Add the following into your fluentd config.
 
 Simple:
 
-	<source>
-		type spectrum
-    	endpoint spectrum.yourdomain.com 	# required, FQDN of endpoint
-    	user username  # required
-    	pass password  # required
-    	interval 60    # optional, interval in seconds, defaults to 300
-    </source>
-
-	<match alert.spectrum>
-  		type stdout
-	</match>
+<source>
+  type spectrum
+  endpoint spectrum.yourdomain.com 	# required, FQDN of endpoint
+  user username  # required
+  pass password  # required
+  interval 60    # optional, interval in seconds, defaults to 300
+</source>
+<match alert.spectrum>
+  type stdout
+</match>
 
 Advanced:
 
-	<source>
-		type spectrum
-    	endpoint spectrum.yourdomain.com 	# required, FQDN of endpoint
-    	user username  # required
-    	pass password  # required
-    	interval 60    # optional, interval in seconds, defaults to 300
-    </source>
-  
-  # using rename_key to map to new keynames
-	<match alert.spectrum>
-  		type rename_key
-  		deep_rename false
-  		remove_tag_prefix alert.spectrum
-  		append_tag alert
-  		rename_rule1 HOSTNAME source_hostname
-  		rename_rule2 IP_ADDRESS source_ip
-  		rename_rule3 ALARM_TITLE event_name
-  		rename_rule4 SEVERITY criticality
-  		rename_rule5 CREATION_DATE creation_time
-  		rename_rule6 ORIGINATING_EVENT_ATTR alert_description
-  		rename_rule7 MODEL_STRING source_type
-  		rename_rule8 ALARM_ID source_event_id
-  		rename_rule9 GC_NAME environment
-	</match>
-	
-  # using key_picker to remove extra fields
-	<match alert>
-  		type key_picker
-  		keys event_type,intermediary_source,source_event_id,creation_time,criticality,event_name,source_hostname,source_ip,alert_description,source_type,environment
-  		add_tag_prefix processed.
-	</match>
-
-	# send to STDOUT
-  <match processed.alert>
-  		type stdout
-	</match>
+<source>
+  type spectrum
+  endpoint spectrum.yourdomain.com 	# required, FQDN of endpoint
+  user username  # required
+  pass password  # required
+  interval 60    # optional, interval in seconds, defaults to 300
+</source>
+# using rename_key to map to new keynames
+<match alert.spectrum>
+  type rename_key
+  deep_rename false
+  remove_tag_prefix alert.spectrum
+  append_tag alert
+  rename_rule1 HOSTNAME source_hostname
+  rename_rule2 IP_ADDRESS source_ip
+  rename_rule3 ALARM_TITLE event_name
+  rename_rule4 SEVERITY criticality
+  rename_rule5 CREATION_DATE creation_time
+  rename_rule6 ORIGINATING_EVENT_ATTR alert_description
+  rename_rule7 MODEL_STRING source_type
+  rename_rule8 ALARM_ID source_event_id
+  rename_rule9 GC_NAME environment
+</match>
+# using key_picker to remove extra fields
+<match alert>
+  type key_picker
+  keys event_type,intermediary_source,source_event_id,creation_time,criticality,event_name,source_hostname,source_ip,alert_description,source_type,environment
+  add_tag_prefix processed.
+</match>
+# send to STDOUT
+<match processed.alert>
+  type stdout
+</match>
 
 Now startup fluentd
 
