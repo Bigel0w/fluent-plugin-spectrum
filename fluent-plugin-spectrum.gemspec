@@ -3,12 +3,12 @@ $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |gem|
   gem.name          = "fluent-plugin-spectrum"
-  gem.version       = "0.0.5"
-  gem.date          = '2015-03-31'
+  gem.version       = "0.0.6"
+  gem.date          = '2015-04-04'
   gem.authors       = ["Alex Pena"]
   gem.email         = ["pena.alex@gmail.com"]
-  gem.summary       = %q{Fluentd input plugin for pulling alerts from CA Spectrum}
-  gem.description   = %q{Fluentd plugin for pulling monitoring alerts from CA Spectrum}
+  gem.summary       = %q{Fluentd plugin for managing monitoring alerts from CA Spectrum}
+  gem.description   = %q{Fluentd input/output plugin for managing monitoring alerts from CA Spectrum. Input supports polling CA Spectrum APIs. Output currently only supports updating events retrieved from Spectrum.}
   gem.homepage      = 'https://github.com/Bigel0w/fluent-plugin-spectrum'
   gem.license       = 'MIT'
 
@@ -16,10 +16,10 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.require_paths = ["lib"]
-
-  gem.add_development_dependency "rake", '~> 0.9', '>= 0.9.6'
-
-  gem.add_runtime_dependency "fluentd", '~> 0.10', '>= 0.10.52'
-  gem.add_runtime_dependency "json", '~> 1.1', '>= 1.8.2'
-  gem.add_runtime_dependency "rest-client", '~> 1.7', '>= 1.7.3'
+  # dev deps
+  gem.add_development_dependency "rake", '~> 10.0'
+  # runtime deps
+  gem.add_runtime_dependency "fluentd", '~> 0.12'
+  gem.add_runtime_dependency "json", '~> 1.8'
+  gem.add_runtime_dependency "rest-client", '~> 1.8'
 end
