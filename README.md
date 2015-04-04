@@ -30,13 +30,11 @@ Add the following into your fluentd config.
 Simple:
 
 	<source>
-		type spectrum 						# required, choosing the input plugin
-    	endpoint spectrum.yourdomain.com 	# required, FQDN of spectrum endpoint
-    	user username 						# required, username for APIs
-    	pass password 						# required, password for APIs
-    	tag alert.spectrum 					# optional, tag to assign to events, default is alert.spectrum
-    	interval 60 						# optional, interval in seconds for how often to poll, defaults to 300
-    	include_raw false 					# optional, include original object as key raw
+		type spectrum
+    	endpoint spectrum.yourdomain.com 	# required, FQDN of endpoint
+    	user username  # required
+    	pass password  # required
+    	interval 60    # optional, interval in seconds, defaults to 300
     </source>
 
 	<match alert.spectrum>
@@ -46,15 +44,14 @@ Simple:
 Advanced:
 
 	<source>
-		type spectrum 						# required, choosing the input plugin
-    	endpoint spectrum.yourdomain.com 	# required, FQDN of spectrum endpoint
-    	user username 						# required, username for APIs
-    	pass password 						# required, password for APIs
-    	tag alert.spectrum 					# optional, tag to assign to events, default is alert.spectrum
-    	interval 60 						# optional, interval in seconds for how often to poll, defaults to 300
-    	include_raw true 					# optional, include original object as key raw
+		type spectrum
+    	endpoint spectrum.yourdomain.com 	# required, FQDN of endpoint
+    	user username  # required
+    	pass password  # required
+    	interval 60    # optional, interval in seconds, defaults to 300
     </source>
-    # using rename_key to map to new keynames
+  
+  # using rename_key to map to new keynames
 	<match alert.spectrum>
   		type rename_key
   		deep_rename false
@@ -70,13 +67,16 @@ Advanced:
   		rename_rule8 ALARM_ID source_event_id
   		rename_rule9 GC_NAME environment
 	</match>
-	# using key_picker to remove extra fields
+	
+  # using key_picker to remove extra fields
 	<match alert>
   		type key_picker
-  		keys event_type,intermediary_source,source_event_id,creation_time,criticality,event_name,source_hostname,source_ip,alert_description,source_type,environment,raw
+  		keys event_type,intermediary_source,source_event_id,creation_time,criticality,event_name,source_hostname,source_ip,alert_description,source_type,environment
   		add_tag_prefix processed.
 	</match>
-	<match processed.alert>
+
+	# send to STDOUT
+  <match processed.alert>
   		type stdout
 	</match>
 
