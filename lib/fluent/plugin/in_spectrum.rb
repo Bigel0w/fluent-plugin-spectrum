@@ -217,9 +217,9 @@ module Fluent
         begin
           res=resource.post @xml,:content_type => 'application/xml',:accept => 'application/json'
           body = JSON.parse(res.body)
-          pollingEnd = Engine.now.to_i
+          pollingEnd = Time.parse(res.headers[:date]).to_i
           @state_store.last_records['spectrum'] = pollingEnd
-          pollingDuration = pollingEnd - pollingStart
+          pollingDuration = Engine.now.to_i - pollingStart
         end  
 
         # Processing for multiple alerts returned
