@@ -45,9 +45,10 @@ Advanced:
     <source>
       type spectrum
       endpoint spectrum.yourdomain.com 	# required, FQDN of endpoint
-      user username  # required
-      pass password  # required
-      interval 60    # optional, interval in seconds, defaults to 300
+      user username                     # required
+      pass password                     # required
+      interval 60                       # optional, interval in seconds, defaults to 300
+      state_file /tmp/spectrum_state    # optional, file to keep state    
     </source>
     # using rename_key to map to new keynames
     <match alert.spectrum>
