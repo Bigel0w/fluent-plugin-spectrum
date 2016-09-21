@@ -96,3 +96,5 @@ Verify:
 * All flag to allow specifying spectrum attributes to get or get _ALL_
 * Add flag to allow start date/time if users want to backfill data from a specific date. then start loop. 
 * Add flag to disable loop, if users only wanted to backfill from datetime to now or specific end time. 
+
+* Adding test for update
